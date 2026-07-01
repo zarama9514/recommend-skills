@@ -1,11 +1,17 @@
 ---
 name: recommend-skills
-description: Recommend the most relevant installed skills for a task. Use when the user asks which skill / what skill to use, wants skill recommendations or suggestions, needs help choosing between skills, or wants to discover skills that apply to their task. Triggers on phrases like "recommend skills", "which skill", "what skills do you have for", "suggest a skill", "help me choose a skill".
+description: Advisory mode for skill discovery — lists and compares the installed skills that fit a task and explains why, but does NOT execute them. Use when the user asks which skill / what skill to use, wants skill recommendations or suggestions, needs help choosing between skills, or wants to browse skills that apply to their task before committing. Triggers on phrases like "recommend skills", "which skill", "what skills do you have for", "suggest a skill", "help me choose a skill". This is a compare-and-explain step, not a do-the-task step.
 ---
 
-# Skill Recommender
+# Skill Recommender (advisory mode)
 
 Analyze the user's request and point them to the installed skills that best fit it.
+
+**This skill is advisory: it lists, ranks, and explains candidate skills — it does
+not run them or do the underlying task.** By default Claude Code will silently
+auto-activate a single matching skill and execute it; this skill is the opposite
+mode — surface several options with reasons so the user can choose. After showing
+the shortlist, stop and let the user pick; only proceed to run a skill if they ask.
 
 ## Source of truth: the skills already in your context
 
@@ -55,6 +61,9 @@ Top matches for: "<the user's request>"
 
 Close with a workflow hint when skills chain together, e.g.
 "Pipeline: /skill-a to prepare, then /skill-b to analyze, then /skill-c to plot."
+
+Then **stop** — do not start executing any recommended skill unless the user
+explicitly asks you to run it.
 
 ## Example (illustrative — actual matches depend on what is installed)
 

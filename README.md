@@ -1,14 +1,34 @@
 # Recommend Skills
 
-A Claude Code skill that intelligently recommends relevant skills based on your request. Analyzes your task and suggests the most applicable skills from your installed skill library.
+An **advisory** Claude Code skill for skill discovery. Given a task, it lists and
+compares the installed skills that fit — and explains why — but it **does not run
+them or do the underlying task**. It is a "show me my options and reasons" step,
+not a "just do it" step.
+
+## Why this exists
+
+By default, Claude Code already keeps the list of available skills in context and
+will **silently auto-activate a single matching skill and execute it**. This skill
+is the deliberate opposite mode:
+
+| | Default auto-activation | `/recommend-skills` (advisory) |
+|---|---|---|
+| Behavior | picks one skill and runs it | lists several candidates, does not run them |
+| Candidates | usually one | multiple, plus pipeline suggestions |
+| Transparency | choice is implicit | each pick comes with a reason |
+| Purpose | "do the task" | "compare options, then I choose" |
+
+It adds no new capability — the model could answer "which skill for X?" from
+context anyway — but it standardizes a predictable **compare-and-explain**
+interaction and guarantees nothing gets executed until you decide.
 
 ## Features
 
-- Smart Matching — Uses semantic understanding rather than keyword matching
-- Works with any skill collection — adapts to your installed skills
-- Clear Explanations — Shows why each skill matches your request
-- Workflow Suggestions — Recommends how to combine multiple skills
-- No External Dependencies — Works locally with your installed skills
+- Advisory only — lists and compares, never executes
+- Works with any skill collection (user, project, plugin, and built-in skills)
+- Clear explanations of why each skill matches
+- Workflow suggestions for chaining multiple skills
+- No script, no external dependencies — pure model judgment
 
 ## Installation
 
@@ -35,7 +55,7 @@ git clone https://github.com/zarama9514/recommend-skills.git
 
 ## Usage
 
-Simply invoke the skill with your question:
+Invoke the skill with your question:
 
 ```
 /recommend-skills protein-ligand prediction and binding affinity
@@ -49,31 +69,31 @@ Simply invoke the skill with your question:
 /recommend-skills single-cell RNA-seq analysis workflow
 ```
 
-The skill will return:
-- Top relevant skills ranked by match
-- One-line description of each skill
-- Clear explanation of why it matches your request
-- Workflow suggestions for combining skills
+It returns a ranked shortlist of relevant skills with a one-line description and
+a reason for each, plus a pipeline hint when they chain — then stops so you can
+choose. It will only run a recommended skill if you explicitly ask.
 
 ## Example Output
 
 ```
-Top Skill Matches (for: "protein-ligand prediction")
+Top matches for: "protein-ligand prediction and binding affinity"
 
 1. /diffdock
-   Molecular docking for protein-small-molecule pose prediction
-   Why: directly designed for protein-ligand binding poses
+   Molecular docking for protein-small-molecule poses
+   Why: built for exactly this — predicts binding poses with confidence
 
 2. /rowan
-   Cloud molecular modeling with binding affinity prediction
-   Why: includes binding affinity and docking capabilities
+   Cloud molecular modeling incl. binding affinity
+   Why: covers the ΔG / affinity side of the request
 
-3. /deepchem
-   Molecular ML with ADMET and affinity prediction
-   Why: can predict binding affinity using pre-trained models
+3. /rdkit
+   Cheminformatics for ligand prep (SMILES, conformers)
+   Why: supporting step to prepare inputs
 
-Workflow: /diffdock (get poses) then /rowan (predict affinity)
+Pipeline: /rdkit to prep ligands, /diffdock for poses, /rowan for affinity.
 ```
+
+(Illustrative — actual matches depend on what is installed.)
 
 ## How It Works
 
@@ -83,20 +103,8 @@ When triggered, the skill:
 2. Matches against the list of available skills that Claude Code injects into
    context — this covers user, project, plugin, and built-in skills, so it works
    regardless of where your skills are installed
-3. Ranks skills by semantic relevance to your request
-4. Formats recommendations with explanations and workflow suggestions
-
-The skill uses semantic understanding rather than keyword matching, making
-recommendations accurate for complex or multi-domain requests. It relies purely
-on the model's judgment — there is no script and no external dependency.
-
-## Compatible Skill Collections
-
-This skill works with:
-- Scientific Agent Skills (K-Dense-AI)
-- Claude Scientific Writer Skills
-- Any custom skill collection installed locally
-- Mixed skill libraries from multiple sources
+3. Ranks the candidates by semantic relevance and explains each
+4. Presents the shortlist and stops — no skill is executed unless you ask
 
 ## Requirements
 
@@ -109,4 +117,6 @@ MIT
 
 ---
 
-Quick Tip: Use /recommend-skills whenever you're unsure which skill applies to your task, or when you want to discover skills for a new domain.
+Quick Tip: Use `/recommend-skills` when you want to compare options before
+committing. If you just want the task done, let Claude auto-activate a skill
+normally.
