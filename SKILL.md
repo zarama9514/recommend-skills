@@ -1,95 +1,82 @@
 ---
 name: recommend-skills
-description: Analyze user request and recommend the most relevant installed skills with clear explanations. Use when user asks for skill recommendations, needs help choosing between skills, or wants to discover applicable skills for their task.
-triggers:
-  - "recommend skills"
-  - "which skills"
-  - "what skills"
-  - "match skills"
-  - "find relevant skills"
-  - "skill recommendation"
-  - "help me choose a skill"
-  - "suggest skills"
+description: Recommend the most relevant installed skills for a task. Use when the user asks which skill / what skill to use, wants skill recommendations or suggestions, needs help choosing between skills, or wants to discover skills that apply to their task. Triggers on phrases like "recommend skills", "which skill", "what skills do you have for", "suggest a skill", "help me choose a skill".
 ---
 
 # Skill Recommender
 
-When this skill is triggered, analyze the user's request and recommend the most relevant skills from all installed skills in your environment.
+Analyze the user's request and point them to the installed skills that best fit it.
 
-## Your Task
+## Source of truth: the skills already in your context
 
-1. **Parse the user's request** — extract domain, task type, and key requirements
-   - Is it about: proteins? RNA? data analysis? writing? visualization? ML? etc.
-   - What's the core task: prediction? analysis? visualization? generation? processing?
-   - Any specific tools/formats mentioned? (SMILES, BAM, FASTA, etc.)
+Claude Code injects the full list of available skills — with their descriptions —
+into your context at the start of the session (the "available skills" list, and
+any `Skill` tool definitions). **That list is authoritative.** Use it directly.
 
-2. **Scan installed skills** — you should:
-   - Reference the skill descriptions available in ~/.claude/skills/
-   - Look at each skill's description and triggers
-   - Match against the user's request semantically
-   - Do NOT assume specific skills exist — work with what's installed
+- It already covers every source: user (`~/.claude/skills/`), project
+  (`.claude/skills/`), plugins, and built-in skills.
+- Do NOT enumerate `~/.claude/skills/` by reading files — that is slower and
+  misses project, plugin, and built-in skills. Only read a specific `SKILL.md`
+  if you need detail beyond its description to break a tie.
+- Never recommend a skill that is not in that list.
+- Never recommend `recommend-skills` itself.
 
-3. **Rank by relevance** — consider:
-   - **Exact match:** skill directly addresses the task
-   - **Primary fit:** highly relevant to the core need
-   - **Secondary fit:** useful complement or related analysis
-   - Only include relevant matches (use semantic judgment, not percentages)
+## What to do
 
-4. **Format your response** clearly:
-   ```
-   Top Skill Matches (for: "user's request")
-   
-   1. /skill-name
-      One-line description of what it does
-      Why: how it directly matches their request
-   
-   2. /skill-name
-      Description
-      Why: secondary reason it's relevant
-   ```
+1. **Understand the request** — the domain (proteins, RNA, stats, writing,
+   visualization, ML, …), the core action (predict / analyze / visualize /
+   generate / convert / review …), and any tools or formats named (SMILES, BAM,
+   FASTA, .docx, …).
 
-5. **Add context** if helpful:
-   - "Use /skill-name for this exact workflow"
-   - "Pair /skill-1 with /skill-2 for end-to-end pipeline"
-   - "This skill not available in your installation"
+2. **Match against the available-skills list semantically.** Compare the intent,
+   not just keywords. A request often maps to 1–4 skills; some tasks chain
+   several into a pipeline.
 
-## How to Find Installed Skills
+3. **Rank by fit** using judgment (no percentage scores):
+   - Direct fit — the skill is built for exactly this task.
+   - Strong fit — clearly relevant to the core need.
+   - Supporting fit — a useful complement (e.g. visualization or literature).
+   Return only genuinely relevant skills. If nothing fits well, say so plainly
+   and suggest the closest general-purpose option.
 
-When recommending, check what skills are actually available:
-- Read descriptions from ~/.claude/skills/*/SKILL.md if needed
-- Only recommend skills that exist in the user's installation
-- Suggest "This type of task typically uses X skill, check if it's installed" if unsure
+## Output format
 
-## Example
-
-**User:** `/recommend-skills protein-ligand prediction`
-
-**Check installed skills**, then respond:
 ```
-Top Skill Matches (for: "protein-ligand prediction")
+Top matches for: "<the user's request>"
+
+1. /skill-name
+   One line on what it does
+   Why: how it fits this request
+
+2. /skill-name
+   One line on what it does
+   Why: how it fits this request
+```
+
+Close with a workflow hint when skills chain together, e.g.
+"Pipeline: /skill-a to prepare, then /skill-b to analyze, then /skill-c to plot."
+
+## Example (illustrative — actual matches depend on what is installed)
+
+User: `/recommend-skills protein-ligand pose prediction and binding affinity`
+
+```
+Top matches for: "protein-ligand pose prediction and binding affinity"
 
 1. /diffdock
-   Molecular docking for protein-small-molecule pose prediction
-   Why: directly designed for protein-ligand binding poses
+   Molecular docking for protein-small-molecule poses
+   Why: built for exactly this — predicts binding poses with confidence
 
 2. /rowan
-   Cloud molecular modeling with binding affinity
-   Why: includes binding affinity and docking capabilities
+   Cloud molecular modeling incl. binding affinity
+   Why: covers the ΔG / affinity side of the request
 
-3. /deepchem
-   Molecular ML with ADMET and affinity prediction
-   Why: can predict binding using pre-trained models
+3. /rdkit
+   Cheminformatics for ligand prep (SMILES, conformers)
+   Why: supporting step to prepare inputs
+
+Pipeline: /rdkit to prep ligands, /diffdock for poses, /rowan for affinity.
 ```
 
-Or if those skills aren't installed:
-```
-Top Skill Matches (for: "protein-ligand prediction")
-
-1. /rdkit
-   Cheminformatics toolkit for molecular preparation
-   Why: essential for handling SMILES and molecule data
-```
-
----
-
-**Key:** Use semantic understanding based on the installed skills available to the user, not a hardcoded list.
+If none of those are installed, recommend whatever the available list actually
+contains for that domain instead.

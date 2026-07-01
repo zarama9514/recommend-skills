@@ -80,11 +80,15 @@ Workflow: /diffdock (get poses) then /rowan (predict affinity)
 When triggered, the skill:
 
 1. Parses your request to extract domain, task type, and requirements
-2. References your installed skills from ~/.claude/skills/
+2. Matches against the list of available skills that Claude Code injects into
+   context — this covers user, project, plugin, and built-in skills, so it works
+   regardless of where your skills are installed
 3. Ranks skills by semantic relevance to your request
 4. Formats recommendations with explanations and workflow suggestions
 
-The skill uses semantic understanding rather than simple keyword matching, making recommendations accurate for complex or multi-domain requests.
+The skill uses semantic understanding rather than keyword matching, making
+recommendations accurate for complex or multi-domain requests. It relies purely
+on the model's judgment — there is no script and no external dependency.
 
 ## Compatible Skill Collections
 
