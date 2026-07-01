@@ -14,7 +14,7 @@ triggers:
 
 # Skill Recommender
 
-When this skill is triggered, analyze the user's request and recommend the most relevant skills from all installed skills.
+When this skill is triggered, analyze the user's request and recommend the most relevant skills from all installed skills in your environment.
 
 ## Your Task
 
@@ -23,63 +23,73 @@ When this skill is triggered, analyze the user's request and recommend the most 
    - What's the core task: prediction? analysis? visualization? generation? processing?
    - Any specific tools/formats mentioned? (SMILES, BAM, FASTA, etc.)
 
-2. **Mentally scan installed skills** — reference the skill list you know:
-   - **Protein/Molecular:** diffdock, deepchem, torchdrug, rdkit, datamol, esm, tamarind, rowan, molecular-dynamics, glycoengineering
-   - **RNA/Single-cell:** scanpy, scvi-tools, scvelo, bulk-rnaseq, cellxgene-census, anndata
-   - **Writing/Docs:** scientific-writing, literature-review, clinical-reports, treatment-plans, scientific-slides, latex-posters, docx, pptx
-   - **Data/Stats:** statistical-analysis, statistical-power, exploratory-data-analysis, scikit-learn, statsmodels, pymc
-   - **Visualization:** matplotlib, seaborn, scientific-visualization, scientific-schematics, generate-image
-   - **ML:** pytorch-lightning, transformers, scikit-learn, stable-baselines3, shap
-   - **Genomics:** pysam, geopandas, phylogenetics, nextflow, biopython, bioservices
-   - **Medical/Clinical:** pyhealth, pydicom, clinical-decision-support, neurokit2
-   - **Lab/Automation:** opentrons-integration, pylabrobot, benchling-integration, labarchive-integration
-   - **Specialized:** pathway-enrichment, neuropixels-analysis, pathml, modal, optimize-for-gpu
+2. **Scan installed skills** — you should:
+   - Reference the skill descriptions available in ~/.claude/skills/
+   - Look at each skill's description and triggers
+   - Match against the user's request semantically
+   - Do NOT assume specific skills exist — work with what's installed
 
 3. **Rank by relevance** — consider:
    - **Exact match:** skill directly addresses the task
    - **Primary fit:** highly relevant to the core need
    - **Secondary fit:** useful complement or related analysis
-   - Only include scores 70%+ unless user is asking "what could help"
+   - Only include relevant matches (use semantic judgment, not percentages)
 
 4. **Format your response** clearly:
    ```
-   🎯 Top Skill Matches (for: "user's request")
+   Top Skill Matches (for: "user's request")
    
-   1. /skill-name [⭐⭐⭐ 95% match]
+   1. /skill-name
       One-line description of what it does
       Why: how it directly matches their request
    
-   2. /skill-name [⭐⭐ 70% match]
+   2. /skill-name
       Description
       Why: secondary reason it's relevant
    ```
 
 5. **Add context** if helpful:
-   - "Use `/skill-name` for this exact workflow"
-   - "Pair `/skill-1` with `/skill-2` for end-to-end pipeline"
-   - "Skip `/skill-x` — not suitable because..."
+   - "Use /skill-name for this exact workflow"
+   - "Pair /skill-1 with /skill-2 for end-to-end pipeline"
+   - "This skill not available in your installation"
+
+## How to Find Installed Skills
+
+When recommending, check what skills are actually available:
+- Read descriptions from ~/.claude/skills/*/SKILL.md if needed
+- Only recommend skills that exist in the user's installation
+- Suggest "This type of task typically uses X skill, check if it's installed" if unsure
 
 ## Example
 
-**User:** `/recommend-skills protein-ligand prediction and binding affinity`
+**User:** `/recommend-skills protein-ligand prediction`
 
-**Response:**
+**Check installed skills**, then respond:
 ```
-🎯 Top Skill Matches (for: "protein-ligand prediction and binding affinity")
+Top Skill Matches (for: "protein-ligand prediction")
 
-1. /diffdock [⭐⭐⭐ 98% match]
+1. /diffdock
    Molecular docking for protein-small-molecule pose prediction
    Why: directly designed for protein-ligand binding poses
 
-2. /rowan [⭐⭐⭐ 95% match]
-   Cloud molecular modeling with binding affinity prediction
-   Why: includes explicit ΔG binding affinity prediction
+2. /rowan
+   Cloud molecular modeling with binding affinity
+   Why: includes binding affinity and docking capabilities
 
-3. /deepchem [⭐⭐ 82% match]
-   Molecular ML with ADMET and affinity prediction models
-   Why: can predict binding affinity using pre-trained models
+3. /deepchem
+   Molecular ML with ADMET and affinity prediction
+   Why: can predict binding using pre-trained models
+```
+
+Or if those skills aren't installed:
+```
+Top Skill Matches (for: "protein-ligand prediction")
+
+1. /rdkit
+   Cheminformatics toolkit for molecular preparation
+   Why: essential for handling SMILES and molecule data
 ```
 
 ---
 
-**Key:** Be confident and specific. Use semantic understanding, not keyword matching.
+**Key:** Use semantic understanding based on the installed skills available to the user, not a hardcoded list.

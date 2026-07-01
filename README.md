@@ -4,17 +4,17 @@ A Claude Code skill that intelligently recommends relevant skills based on your 
 
 ## Features
 
-- 🎯 **Smart Matching** — Uses semantic understanding rather than keyword matching
-- 📚 **Full Coverage** — Knows about 150+ scientific and technical skills
-- 💡 **Clear Explanations** — Shows why each skill matches your request
-- 🔗 **Workflow Suggestions** — Recommends how to combine multiple skills
-- ⚡ **Fast Recommendations** — Instant analysis without external APIs
+- Smart Matching — Uses semantic understanding rather than keyword matching
+- Works with any skill collection — adapts to your installed skills
+- Clear Explanations — Shows why each skill matches your request
+- Workflow Suggestions — Recommends how to combine multiple skills
+- No External Dependencies — Works locally with your installed skills
 
 ## Installation
 
 ### Option 1: Direct Installation
 
-Copy the `SKILL.md` file to your Claude Code skills directory:
+Copy the SKILL.md file to your Claude Code skills directory:
 
 ```bash
 # User-level (macOS/Linux)
@@ -50,7 +50,7 @@ Simply invoke the skill with your question:
 ```
 
 The skill will return:
-- Top 5 relevant skills ranked by match percentage
+- Top relevant skills ranked by match
 - One-line description of each skill
 - Clear explanation of why it matches your request
 - Workflow suggestions for combining skills
@@ -58,57 +58,51 @@ The skill will return:
 ## Example Output
 
 ```
-🎯 Top Skill Matches (for: "protein-ligand prediction and binding affinity")
+Top Skill Matches (for: "protein-ligand prediction")
 
-1. /diffdock [⭐⭐⭐ 98% match]
+1. /diffdock
    Molecular docking for protein-small-molecule pose prediction
    Why: directly designed for protein-ligand binding poses
 
-2. /rowan [⭐⭐⭐ 95% match]
+2. /rowan
    Cloud molecular modeling with binding affinity prediction
-   Why: includes explicit ΔG binding affinity prediction
+   Why: includes binding affinity and docking capabilities
 
-3. /deepchem [⭐⭐ 82% match]
-   Molecular ML with ADMET and affinity prediction models
+3. /deepchem
+   Molecular ML with ADMET and affinity prediction
    Why: can predict binding affinity using pre-trained models
 
-💡 Workflow: /diffdock (get poses) → /rowan (predict ΔG)
+Workflow: /diffdock (get poses) then /rowan (predict affinity)
 ```
 
 ## How It Works
 
 When triggered, the skill:
+
 1. Parses your request to extract domain, task type, and requirements
-2. References the comprehensive skill catalog (150+ scientific and technical skills)
-3. Ranks skills by semantic relevance
+2. References your installed skills from ~/.claude/skills/
+3. Ranks skills by semantic relevance to your request
 4. Formats recommendations with explanations and workflow suggestions
 
-The skill uses **semantic understanding** rather than simple keyword matching, making recommendations more accurate for complex or multi-domain requests.
+The skill uses semantic understanding rather than simple keyword matching, making recommendations accurate for complex or multi-domain requests.
 
-## Supported Domains
+## Compatible Skill Collections
 
-- **Protein/Molecular:** Docking, structure prediction, binding affinity, design
-- **RNA/Single-cell:** Sequencing analysis, transcript processing, cell analysis
-- **Data/Statistics:** Statistical analysis, machine learning, visualization
-- **Genomics:** Variant analysis, alignment, genome assembly
-- **Writing/Docs:** Scientific manuscripts, reports, presentations
-- **Medical/Clinical:** EHR analysis, clinical decision support
-- **Lab/Automation:** Lab equipment control, protocol management
-- And 150+ more specialized skills
+This skill works with:
+- Scientific Agent Skills (K-Dense-AI)
+- Claude Scientific Writer Skills
+- Any custom skill collection installed locally
+- Mixed skill libraries from multiple sources
 
 ## Requirements
 
-- Claude Code with installed skills library
+- Claude Code with installed skills
 - No external dependencies
 
 ## License
 
 MIT
 
-## Contributing
-
-Suggestions for improvement welcome. The skill maintains a mental catalog of available skills and can be updated as new skills are installed.
-
 ---
 
-**Quick Tip:** Use `/recommend-skills` whenever you're unsure which skill applies to your task, or when you want to discover skills for a new domain.
+Quick Tip: Use /recommend-skills whenever you're unsure which skill applies to your task, or when you want to discover skills for a new domain.
