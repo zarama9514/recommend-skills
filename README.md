@@ -30,7 +30,7 @@ cp SKILL.md .claude/skills/recommend-skills/
 
 ```bash
 cd ~/.claude/skills/
-git clone https://github.com/yourusername/recommend-skills.git
+git clone https://github.com/zarama9514/recommend-skills.git
 ```
 
 ## Usage
